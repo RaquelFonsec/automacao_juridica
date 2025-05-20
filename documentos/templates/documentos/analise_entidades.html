@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <title>Análise de Entidades - Relatório {{ relatorio.id }}</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0 20px;
+            color: #333;
+        }
+        header {
+            background-color: #004085;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0;
+            font-weight: 600;
+        }
+        main {
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 25px 40px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            border-radius: 8px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #e9ecef;
+            margin-bottom: 12px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
+            font-size: 1rem;
+        }
+        li:nth-child(even) {
+            background-color: #dee2e6;
+        }
+        .empty-message {
+            font-style: italic;
+            color: #777;
+        }
+        a.button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #004085;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        a.button:hover {
+            background-color: #002752;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Análise de Entidades para o Relatório {{ relatorio.id }}</h1>
+    </header>
+    <main>
+        <ul>
+            {% for analise in analises %}
+                <li>{{ analise }}</li>
+            {% empty %}
+                <li class="empty-message">Nenhuma análise encontrada.</li>
+            {% endfor %}
+        </ul>
+
+        <a href="{% url 'detalhe_relatorio' relatorio.id %}" class="button">Voltar ao relatório</a>
+    </main>
+</body>
+</html>

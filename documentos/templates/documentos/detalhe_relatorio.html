@@ -1,0 +1,110 @@
+{% extends 'documentos/base.html' %}
+
+{% block title %}{{ relatorio.titulo }} - Sistema de Automação Jurídica{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ relatorio.titulo }}</h1>
+        <div>
+            <a href="{% url 'lista_relatorios' %}" class="btn btn-secondary">Voltar</a>
+            
+            {% if relatorio.status == 'pendente' %}
+                <form method="post" action="{% url 'baixar_relatorio' relatorio.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Baixar</button>
+                </form>
+            {% elif relatorio.status == 'baixado' %}
+                <form method="post" action="{% url 'processar_relatorio' relatorio.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Processar</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informações do Relatório</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Título:</dt>
+                        <dd class="col-sm-8">{{ relatorio.titulo }}</dd>
+                        
+                        <dt class="col-sm-4">URL de Origem:</dt>
+                        <dd class="col-sm-8"><a href="{{ relatorio.url_origem }}" target="_blank">{{ relatorio.url_origem }}</a></dd>
+                        
+                        <dt class="col-sm-4">Tipo:</dt>
+                        <dd class="col-sm-8">{{ relatorio.get_tipo_display }}</dd>
+                        
+                        <dt class="col-sm-4">Status:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge {% if relatorio.status == 'processado' %}bg-success{% elif relatorio.status == 'baixado' %}bg-info{% elif relatorio.status == 'erro' %}bg-danger{% else %}bg-warning{% endif %}">
+                                {{ relatorio.get_status_display }}
+                            </span>
+                        </dd>
+                        
+                        <dt class="col-sm-4">Criado em:</dt>
+                        <dd class="col-sm-8">{{ relatorio.criado_em|date:"d/m/Y H:i" }}</dd>
+                        
+                        {% if relatorio.baixado_em %}
+                            <dt class="col-sm-4">Baixado em:</dt>
+                            <dd class="col-sm-8">{{ relatorio.baixado_em|date:"d/m/Y H:i" }}</dd>
+                        {% endif %}
+                        
+                        {% if relatorio.processado_em %}
+                            <dt class="col-sm-4">Processado em:</dt>
+                            <dd class="col-sm-8">{{ relatorio.processado_em|date:"d/m/Y H:i" }}</dd>
+                        {% endif %}
+                        
+                        {% if relatorio.arquivo %}
+                            <dt class="col-sm-4">Arquivo:</dt>
+                            <dd class="col-sm-8"><a href="{{ relatorio.arquivo.url }}" target="_blank">Baixar arquivo</a></dd>
+                        {% endif %}
+                    </dl>
+                    
+                    {% if relatorio.mensagem_erro %}
+                        <div class="alert alert-danger mt-3">
+                            <strong>Erro:</strong> {{ relatorio.mensagem_erro }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Dados Extraídos</h5>
+                </div>
+                <div class="card-body">
+                    {% if relatorio.dados_extraidos.exists %}
+                        <p>Foram extraídos {{ relatorio.dados_extraidos.count }} registros deste relatório.</p>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'dados_extraidos' relatorio.id %}" class="btn btn-primary">Ver Dados Extraídos</a>
+                            <a href="{% url 'dados_extraidos' relatorio.id %}?format=csv" class="btn btn-outline-secondary">Exportar para CSV</a>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Nenhum dado extraído. Processe o relatório para extrair dados.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Análise de Entidades</h5>
+                </div>
+                <div class="card-body">
+                    {% if relatorio.analises.exists %}
+                        <p>Foram realizadas {{ relatorio.analises.count }} análises de texto neste relatório.</p>
+                        <a href="{% url 'analise_entidades' relatorio.id %}" class="btn btn-primary">Ver Análises</a>
+                    {% else %}
+                        <p class="text-muted">Nenhuma análise de entidades disponível.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
